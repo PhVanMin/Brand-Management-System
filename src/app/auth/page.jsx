@@ -16,7 +16,7 @@ export default function AuthPage() {
                         priority
                     />
                     <p className="text-4xl text-center font-bold text-wrap w-1/2">
-                        Welcome to Brand Management System
+                        Welcome to VOU Brand Management System
                     </p>
                 </div>
                 <Tabs defaultValue="signin" className="w-[400px]">

@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/card'
 import Image from 'next/image'
 import image from '../../public/home.png'
+import Link from 'next/link'
 
 export default function Home() {
     return (
@@ -25,7 +26,9 @@ export default function Home() {
                         conference, our platform provides all the tools you need
                         for successful event execution.
                     </p>
-                    <Button>Get Started</Button>
+                    <Button asChild>
+                        <Link href="/auth">Get Started</Link>
+                    </Button>
                 </div>
                 <Image
                     src={image}
