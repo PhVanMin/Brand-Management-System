@@ -15,13 +15,17 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useToast } from '../ui/use-toast'
+import { useToast } from '@/components/ui/use-toast'
 
 const signInData = {
     schema: z.object({
         email: z.string().email(),
         password: z.string().min(6),
     }),
+    defaultValues: {
+        email: '',
+        password: '',
+    },
     fields: [
         {
             name: 'email',
@@ -56,6 +60,14 @@ const signUpData = {
             required_error: 'Address is required.',
         }),
     }),
+    defaultValues: {
+        email: '',
+        name: '',
+        field: '',
+        address: '',
+        gps: '',
+        password: '',
+    },
     fields: [
         {
             name: 'email',

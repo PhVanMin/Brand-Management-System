@@ -1,4 +1,4 @@
-import AuthForm from '@/components/auth/form'
+import AuthForm from './components/form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Image from 'next/image'
 

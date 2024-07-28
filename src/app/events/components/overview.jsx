@@ -1,3 +1,4 @@
+'use client'
 import {
     Table,
     TableBody,
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import CreateSheet from './createSheet'
 
 export default function Overview({ className }) {
     return (
@@ -41,7 +43,7 @@ export default function Overview({ className }) {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
-                        <Button>Create New Event</Button>
+                        <CreateSheet />
                     </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-1">

@@ -57,7 +57,7 @@ export default function Overview({ className, data }) {
                 <Bar dataKey="player" fill="var(--color-player)" radius={4}>
                     <LabelList
                         position="top"
-                        offset={12}
+                        offset={2}
                         className="fill-foreground"
                         fontSize={12}
                     />
@@ -65,7 +65,7 @@ export default function Overview({ className, data }) {
                 <Bar dataKey="voucher" fill="var(--color-voucher)" radius={4}>
                     <LabelList
                         position="top"
-                        offset={12}
+                        offset={2}
                         className="fill-foreground"
                         fontSize={12}
                     />

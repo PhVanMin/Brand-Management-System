@@ -1,7 +1,7 @@
-function TopEventsCard({ event, key }) {
+function TopEventsCard({ event, keyProp }) {
     return (
         <div
-            key={key}
+            key={keyProp}
             className="dark:bg-primary bg-muted p-3 rounded flex items-center"
         >
             <div className="space-y-1">
