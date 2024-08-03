@@ -1,3 +1,4 @@
+'use client'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/select'
 import {
     Sheet,
-    SheetClose,
     SheetContent,
     SheetDescription,
     SheetFooter,
@@ -18,83 +18,38 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover'
 import { useState } from 'react'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-function DateSelect({ id, className, date, setDate }) {
-    return (
-        <div className={className}>
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Button
-                        id="date"
-                        variant={'outline'}
-                        className={cn(
-                            'w-full justify-start text-left font-normal',
-                            !date && 'text-muted-foreground'
-                        )}
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date?.from ? (
-                            date.to ? (
-                                <>
-                                    {format(date.from, 'LLL dd, y')} -{' '}
-                                    {format(date.to, 'LLL dd, y')}
-                                </>
-                            ) : (
-                                format(date.from, 'LLL dd, y')
-                            )
-                        ) : (
-                            <span>Pick a date</span>
-                        )}
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                        id={id}
-                        initialFocus
-                        mode="range"
-                        defaultMonth={date?.from}
-                        selected={date}
-                        onSelect={setDate}
-                        numberOfMonths={1}
-                    />
-                </PopoverContent>
-            </Popover>
-        </div>
-    )
-}
+import VoucherPopover from './add-voucher'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { DateSelect } from './dateSelect'
 
-export default function CreateSheet({ className }) {
+export default function EventSheet({ className }) {
+    const [open, setOpen] = useState(false)
+    const [info, setInfo] = useState({})
+    const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState({
         from: Date.now(),
         to: Date.now(),
     })
-    const [info, setInfo] = useState({})
-    const handleSubmit = async (e) => {
-        e.preventDefault()
+
+    const handleSubmit = async () => {
         console.log(info)
+        await new Promise((r) => setTimeout(r, 2000))
+        setOpen(false)
     }
 
     return (
-        <Sheet className={className}>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <Button>Create New Event</Button>
+                <Button className={className}>Create New Event</Button>
             </SheetTrigger>
             <SheetContent>
                 <SheetHeader>
                     <SheetTitle>Create Event</SheetTitle>
                     <SheetDescription>
-                        Input your event information. Click Add when you are
-                        done.
+                        Create a new event for your brand. Click Save Changes
+                        when finish.
                     </SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-4 py-4">
@@ -144,11 +99,36 @@ export default function CreateSheet({ className }) {
                             min="0"
                             type="number"
                             id="vouchers"
-                            className="col-span-3"
+                            className="col-span-2"
+                        />
+                        <VoucherPopover
+                            chosenVouchers={vouchers}
+                            onChange={setVouchers}
                         />
                     </div>
+                    {vouchers.length > 0 ? (
+                        <div className="grid grid-cols-4 gap-4">
+                            <ScrollArea className="col-start-2 pr-3 col-span-3 max-h-[110px]">
+                                <div className="grid gap-2">
+                                    {vouchers.map((voucher, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex justify-between hover:bg-primary/20 px-2 py-0.5 rounded border border-primary"
+                                        >
+                                            <p className="font-semibold">
+                                                {voucher.name}
+                                            </p>
+                                            <p>{voucher.value}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <p className="text-right">Game</p>
+                        <Label className="text-right">Game</Label>
                         <div className="col-span-3">
                             <Select
                                 onValueChange={(e) =>
@@ -187,9 +167,7 @@ export default function CreateSheet({ className }) {
                     </div>
                 </div>
                 <SheetFooter>
-                    <SheetClose asChild>
-                        <Button onClick={handleSubmit}>Save changes</Button>
-                    </SheetClose>
+                    <Button onClick={handleSubmit}>Save changes</Button>
                 </SheetFooter>
             </SheetContent>
         </Sheet>

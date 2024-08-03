@@ -23,7 +23,7 @@ export default async function RootLayout({ children }) {
         <html lang="en" suppressHydrationWarning>
             <body
                 className={cn(
-                    'min-h-screen bg-background font-sans antialiased',
+                    'min-h-screen flex flex-col bg-background font-sans antialiased',
                     fontSans.variable
                 )}
             >
@@ -35,7 +35,9 @@ export default async function RootLayout({ children }) {
                 >
                     <SessionProvider session={session}>
                         <Navbar />
-                        {children}
+                        <div className="flex-1 bg-muted dark:bg-muted/10">
+                            {children}
+                        </div>
                         <Toaster />
                     </SessionProvider>
                 </ThemeProvider>{' '}

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { ListFilter } from 'lucide-react'
+import { ListFilter, MoreHorizontal, Search } from 'lucide-react'
 import {
     Card,
     CardContent,
@@ -22,13 +22,17 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import CreateSheet from './createSheet'
+import { Input } from '@/components/ui/input'
+import Image from 'next/image'
+import EventSheet from './createSheet'
+import Link from 'next/link'
 
 export default function Overview({ className }) {
     return (
@@ -43,7 +47,7 @@ export default function Overview({ className }) {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
-                        <CreateSheet />
+                        <EventSheet />
                     </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-1">
@@ -77,14 +81,27 @@ export default function Overview({ className }) {
             </div>
             <Card x-chunk="dashboard-05-chunk-3">
                 <CardHeader className="px-7">
-                    <div className="flex justify-between">
-                        <CardTitle>Events</CardTitle>
+                    <CardTitle>Events</CardTitle>
+                    <CardDescription>
+                        Recent events from your brand.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="mb-2 flex justify-between gap-2">
+                        <div className="relative ml-auto flex-1 md:grow-0">
+                            <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search..."
+                                className="w-[250px] h-8 rounded-md bg-background pl-8"
+                            />
+                        </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-7 gap-1 text-sm"
+                                    className="h-8 gap-1 text-sm"
                                 >
                                     <ListFilter className="h-3.5 w-3.5" />
                                     <span className="sr-only sm:not-sr-only">
@@ -107,55 +124,78 @@ export default function Overview({ className }) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <CardDescription>
-                        Recent events from your brand.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Customer</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Image</TableHead>
                                 <TableHead className="hidden sm:table-cell">
-                                    Type
-                                </TableHead>
-                                <TableHead className="hidden sm:table-cell">
-                                    Status
+                                    Field
                                 </TableHead>
                                 <TableHead className="hidden md:table-cell">
-                                    Date
+                                    Voucher Number
                                 </TableHead>
-                                <TableHead className="text-right">
-                                    Amount
+                                <TableHead className="hidden sm:table-cell">
+                                    Address
+                                </TableHead>
+                                <TableHead className="hidden md:table-cell">
+                                    Start Date
+                                </TableHead>
+                                <TableHead className="hidden md:table-cell">
+                                    End Date
+                                </TableHead>
+                                <TableHead>
+                                    <span className="sr-only">Actions</span>
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow className="bg-accent">
+                            <TableRow>
+                                <TableCell>Event 1</TableCell>
                                 <TableCell>
-                                    <div className="font-medium">
-                                        Liam Johnson
-                                    </div>
-                                    <div className="hidden text-sm text-muted-foreground md:inline">
-                                        liam@example.com
-                                    </div>
+                                    <Image
+                                        alt="Event"
+                                        className="rounded-md object-cover"
+                                        width="100"
+                                        height="50"
+                                        src="/voucher-1.jpg"
+                                    />
                                 </TableCell>
-                                <TableCell className="hidden sm:table-cell">
-                                    Sale
+                                <TableCell>
+                                    <Badge variant="outline">Fashion</Badge>
                                 </TableCell>
-                                <TableCell className="hidden sm:table-cell">
-                                    <Badge
-                                        className="text-xs"
-                                        variant="secondary"
-                                    >
-                                        Fulfilled
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="hidden md:table-cell">
-                                    2023-06-23
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    $250.00
+                                <TableCell>1000</TableCell>
+                                <TableCell>Ho Chi Minh</TableCell>
+                                <TableCell>07/08/2024 12:30AM</TableCell>
+                                <TableCell>17/08/2024 12:30AM</TableCell>
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-haspopup="true"
+                                                size="icon"
+                                                variant="ghost"
+                                            >
+                                                <MoreHorizontal className="h-4 w-4" />
+                                                <span className="sr-only">
+                                                    Toggle menu
+                                                </span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuLabel>
+                                                Actions
+                                            </DropdownMenuLabel>
+                                            <Link href="/events/1">
+                                                <DropdownMenuItem>
+                                                    Edit
+                                                </DropdownMenuItem>
+                                            </Link>
+                                            <DropdownMenuItem>
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </TableCell>
                             </TableRow>
                         </TableBody>

@@ -3,9 +3,9 @@ import Overview from './components/overview'
 
 export default function Events() {
     return (
-        <div className="p-4 grid gap-4 grid-cols-3">
+        <div className="p-4 grid gap-4 lg:grid-cols-3">
             <Overview className="col-span-2" />
-            <Info />
+            <Info className="lg:col-span-1 col-span-3" />
         </div>
     )
 }

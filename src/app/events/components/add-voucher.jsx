@@ -1,0 +1,90 @@
+'use client'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
+
+const vouchers = [
+    { id: 'v1', name: 'Voucher 1', value: 100 },
+    { id: 'v2', name: 'Voucher 2', value: 200 },
+    { id: 'v3', name: 'Voucher 3', value: 300 },
+    { id: 'v4', name: 'Voucher 4', value: 400 },
+]
+
+function VoucherCheckbox({ className, cKey, voucher, onChange, checked }) {
+    return (
+        <div className={className} key={cKey}>
+            <Checkbox
+                checked={checked}
+                onCheckedChange={(checked) =>
+                    onChange(function (state) {
+                        if (!checked)
+                            return state.filter((v) => v.id !== voucher.id)
+                        return [...state, voucher]
+                    })
+                }
+                id={voucher.id}
+            />
+            <Label htmlFor={voucher.id}>{voucher.name}</Label>
+        </div>
+    )
+}
+
+export default function VoucherPopover({
+    className,
+    chosenVouchers,
+    onChange,
+}) {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className={className}>Add</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Add Voucher</DialogTitle>
+                    <DialogDescription>
+                        Choose voucher for your event. Click Done when you are
+                        done.
+                    </DialogDescription>
+                </DialogHeader>
+                <ScrollArea className="h-[150px] rounded-md border p-4">
+                    <div className="grid grid-cols-2 gap-2">
+                        {vouchers.map((voucher, index) => (
+                            <VoucherCheckbox
+                                checked={
+                                    chosenVouchers.find(
+                                        (v) => v.id === voucher.id
+                                    )
+                                        ? true
+                                        : false
+                                }
+                                className="flex items-center gap-2"
+                                key={index}
+                                voucher={voucher}
+                                onChange={onChange}
+                            />
+                        ))}
+                    </div>
+                </ScrollArea>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                            Done
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
