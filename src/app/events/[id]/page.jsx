@@ -38,7 +38,11 @@ export default function EventPage({ params }) {
                     </div>
                 </nav>
                 <div className="grid gap-6">
-                    {isEditPage ? <EditEvent /> : <Settings />}
+                    {isEditPage ? (
+                        <EditEvent id={params.id} />
+                    ) : (
+                        <Settings id={params.id} />
+                    )}
                 </div>
             </div>
         </main>

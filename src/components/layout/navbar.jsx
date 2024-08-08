@@ -66,7 +66,9 @@ export function Navbar() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Brand</DropdownMenuLabel>
+                            <DropdownMenuLabel>
+                                {session.user.id}
+                            </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Profile</DropdownMenuItem>
                             <DropdownMenuItem

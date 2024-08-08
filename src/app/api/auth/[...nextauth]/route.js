@@ -6,17 +6,19 @@ const handler = NextAuth({
         CredentialsProvider({
             name: 'credentials',
             async authorize(credentials) {
-                let user = {
-                    reqToken: 'mytoken',
-                }
+                try {
+                    const res = await fetch(`${process.env.API_URL}/Brands/1`)
 
-                if (credentials.signin) {
-                    // TODO: handle sign in
-                } else {
-                    // TODO: handle sign up
-                }
+                    if (res.ok) {
+                        const user = await res.json()
+                        return user
+                    }
 
-                return user ? user : null
+                    return null
+                } catch (error) {
+                    console.log(error)
+                    return null
+                }
             },
         }),
     ],
@@ -25,11 +27,10 @@ const handler = NextAuth({
     },
     callbacks: {
         async jwt({ token, user }) {
-            if (user) token.reqToken = user.reqToken
-            return token
+            return { ...token, ...user }
         },
         async session({ session, token }) {
-            if (token) session.user.reqToken = token.reqToken
+            session.user.id = token.id
             return session
         },
     },

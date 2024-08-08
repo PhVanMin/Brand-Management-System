@@ -8,7 +8,6 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
 import { ListFilter, MoreHorizontal, Search } from 'lucide-react'
 import {
     Card,
@@ -33,8 +32,29 @@ import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 import EventSheet from './createSheet'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { format } from 'date-fns'
 
 export default function Overview({ className }) {
+    const [events, setEvents] = useState([])
+    const { data: session } = useSession()
+
+    const GetEvents = async () => {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Events`
+        )
+
+        if (res.ok) {
+            const events = await res.json()
+            setEvents(events)
+        }
+    }
+
+    useEffect(() => {
+        if (session.user.id) GetEvents()
+    }, [session])
+
     return (
         <div className={cn('grid auto-rows-max items-start gap-4', className)}>
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -47,7 +67,7 @@ export default function Overview({ className }) {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
-                        <EventSheet />
+                        <EventSheet loadEvents={GetEvents} />
                     </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-1">
@@ -129,14 +149,9 @@ export default function Overview({ className }) {
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Image</TableHead>
-                                <TableHead className="hidden sm:table-cell">
-                                    Field
-                                </TableHead>
+                                <TableHead>Game</TableHead>
                                 <TableHead className="hidden md:table-cell">
                                     Voucher Number
-                                </TableHead>
-                                <TableHead className="hidden sm:table-cell">
-                                    Address
                                 </TableHead>
                                 <TableHead className="hidden md:table-cell">
                                     Start Date
@@ -150,54 +165,65 @@ export default function Overview({ className }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell>Event 1</TableCell>
-                                <TableCell>
-                                    <Image
-                                        alt="Event"
-                                        className="rounded-md object-cover"
-                                        width="100"
-                                        height="50"
-                                        src="/voucher-1.jpg"
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="outline">Fashion</Badge>
-                                </TableCell>
-                                <TableCell>1000</TableCell>
-                                <TableCell>Ho Chi Minh</TableCell>
-                                <TableCell>07/08/2024 12:30AM</TableCell>
-                                <TableCell>17/08/2024 12:30AM</TableCell>
-                                <TableCell>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                            >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">
-                                                    Toggle menu
-                                                </span>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>
-                                                Actions
-                                            </DropdownMenuLabel>
-                                            <Link href="/events/1">
+                            {events.map((event, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{event.name}</TableCell>
+                                    <TableCell>
+                                        <Image
+                                            alt="Event"
+                                            className="rounded-md object-cover"
+                                            width="100"
+                                            height="50"
+                                            src="/voucher-1.jpg"
+                                        />
+                                    </TableCell>
+                                    <TableCell>{event.gameId}</TableCell>
+                                    <TableCell>{event.noVoucher}</TableCell>
+                                    <TableCell>
+                                        {format(
+                                            event.startDate,
+                                            'dd/MM/yyyy HH:mm:ss'
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {format(
+                                            event.endDate,
+                                            'dd/MM/yyyy HH:mm:ss'
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-haspopup="true"
+                                                    size="icon"
+                                                    variant="ghost"
+                                                >
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                    <span className="sr-only">
+                                                        Toggle menu
+                                                    </span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>
+                                                    Actions
+                                                </DropdownMenuLabel>
+                                                <Link
+                                                    href={`/events/${event.id}`}
+                                                >
+                                                    <DropdownMenuItem>
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                </Link>
                                                 <DropdownMenuItem>
-                                                    Edit
+                                                    Delete
                                                 </DropdownMenuItem>
-                                            </Link>
-                                            <DropdownMenuItem>
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </CardContent>

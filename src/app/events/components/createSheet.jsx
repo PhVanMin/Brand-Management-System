@@ -23,10 +23,19 @@ import { Button } from '@/components/ui/button'
 import VoucherPopover from './add-voucher'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { DateSelect } from './dateSelect'
+import { useSession } from 'next-auth/react'
+import { useToast } from '@/components/ui/use-toast'
 
-export default function EventSheet({ className }) {
-    const [open, setOpen] = useState(false)
-    const [info, setInfo] = useState({})
+export default function EventSheet({ loadEvents, className }) {
+    const { toast } = useToast()
+    const [isOpen, setOpen] = useState(false)
+    const { data: session } = useSession()
+    const [info, setInfo] = useState({
+        name: '',
+        image: '/voucher-1.jpg',
+        noVoucher: 0,
+        gameId: 0,
+    })
     const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState({
         from: Date.now(),
@@ -34,13 +43,53 @@ export default function EventSheet({ className }) {
     })
 
     const handleSubmit = async () => {
-        console.log(info)
-        await new Promise((r) => setTimeout(r, 2000))
-        setOpen(false)
+        const data = {
+            brandId: session.user.id,
+            name: info.name,
+            image: '/voucher-1.jpg',
+            noVoucher: parseInt(info.noVoucher),
+            gameId: info.gameId,
+            start: new Date(date.from).toJSON(),
+            end: new Date(date.to).toJSON(),
+            voucherIds: vouchers.map((v) => v.id),
+        }
+
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/Events`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                }
+            )
+
+            if (!res.ok) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Create Event Failed',
+                    duration: 3000,
+                    description: `Event with name '${info.name}' already exists.`,
+                })
+            } else {
+                toast({
+                    variant: 'success',
+                    title: 'Create Event Successfully',
+                    description: `Event '${info.name}' is created. Updating event list.`,
+                    duration: 3000,
+                })
+                setOpen(false)
+                loadEvents()
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
-        <Sheet open={open} onOpenChange={setOpen}>
+        <Sheet open={isOpen} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <Button className={className}>Create New Event</Button>
             </SheetTrigger>
@@ -89,22 +138,28 @@ export default function EventSheet({ className }) {
                         <Label htmlFor="vouchers" className="text-right">
                             Number of vouchers
                         </Label>
-                        <Input
-                            onChange={(e) =>
-                                setInfo((info) => ({
-                                    ...info,
-                                    vouchers: e.target.value,
-                                }))
-                            }
-                            min="0"
-                            type="number"
-                            id="vouchers"
-                            className="col-span-2"
-                        />
-                        <VoucherPopover
-                            chosenVouchers={vouchers}
-                            onChange={setVouchers}
-                        />
+                        <div className="flex col-span-3 gap-2">
+                            <Input
+                                onChange={(e) =>
+                                    setInfo((info) => ({
+                                        ...info,
+                                        noVoucher: e.target.value,
+                                    }))
+                                }
+                                min="0"
+                                defaultValue="0"
+                                type="number"
+                                id="vouchers"
+                                className="flex-1"
+                            />
+                            <VoucherPopover
+                                className="p-3 flex justify-center items-center bg-primary cursor-pointer text-white rounded-md"
+                                iconClassname="h-3.5 w-3.5"
+                                chosenVouchers={vouchers}
+                                onChange={setVouchers}
+                                id={session.user.id}
+                            />
+                        </div>
                     </div>
                     {vouchers.length > 0 ? (
                         <div className="grid grid-cols-4 gap-4">
@@ -116,7 +171,7 @@ export default function EventSheet({ className }) {
                                             className="flex justify-between hover:bg-primary/20 px-2 py-0.5 rounded border border-primary"
                                         >
                                             <p className="font-semibold">
-                                                {voucher.name}
+                                                Voucher {voucher.id}
                                             </p>
                                             <p>{voucher.value}</p>
                                         </div>
@@ -131,10 +186,11 @@ export default function EventSheet({ className }) {
                         <Label className="text-right">Game</Label>
                         <div className="col-span-3">
                             <Select
+                                defaultValue="0"
                                 onValueChange={(e) =>
                                     setInfo((info) => ({
                                         ...info,
-                                        game: e,
+                                        gameId: e,
                                     }))
                                 }
                             >
@@ -143,10 +199,8 @@ export default function EventSheet({ className }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="Quiz">
-                                            Quiz
-                                        </SelectItem>
-                                        <SelectItem value="Roll">
+                                        <SelectItem value="0">Quiz</SelectItem>
+                                        <SelectItem value="1">
                                             Rolling in the Deep
                                         </SelectItem>
                                     </SelectGroup>

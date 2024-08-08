@@ -13,13 +13,8 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
-
-const vouchers = [
-    { id: 'v1', name: 'Voucher 1', value: 100 },
-    { id: 'v2', name: 'Voucher 2', value: 200 },
-    { id: 'v3', name: 'Voucher 3', value: 300 },
-    { id: 'v4', name: 'Voucher 4', value: 400 },
-]
+import { FilePenLine } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 function VoucherCheckbox({ className, cKey, voucher, onChange, checked }) {
     return (
@@ -35,7 +30,7 @@ function VoucherCheckbox({ className, cKey, voucher, onChange, checked }) {
                 }
                 id={voucher.id}
             />
-            <Label htmlFor={voucher.id}>{voucher.name}</Label>
+            <Label htmlFor={voucher.id}>Voucher {voucher.id}</Label>
         </div>
     )
 }
@@ -44,11 +39,32 @@ export default function VoucherPopover({
     className,
     chosenVouchers,
     onChange,
+    iconClassname,
+    id,
 }) {
+    const [vouchers, setVouchers] = useState([])
+
+    useEffect(() => {
+        async function GetVouchers() {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/Brands/${id}/Vouchers`
+            )
+
+            if (res.ok) {
+                const vouchers = await res.json()
+                setVouchers(vouchers)
+            }
+        }
+
+        if (id) GetVouchers()
+    }, [id])
+
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className={className}>Add</Button>
+                <div className={className}>
+                    <FilePenLine className={iconClassname} />
+                </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -77,7 +93,18 @@ export default function VoucherPopover({
                         ))}
                     </div>
                 </ScrollArea>
-                <DialogFooter>
+                <DialogFooter className="justify-between">
+                    <div className="flex gap-2">
+                        <Button onClick={() => onChange(vouchers)}>
+                            Add all
+                        </Button>
+                        <Button
+                            onClick={() => onChange([])}
+                            variant="destructive"
+                        >
+                            Clear
+                        </Button>
+                    </div>
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
                             Done
