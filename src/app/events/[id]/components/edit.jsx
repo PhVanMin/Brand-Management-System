@@ -21,9 +21,14 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import VoucherPopover from '../../components/add-voucher'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Ticket } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
+import { useSession } from 'next-auth/react'
 
 export default function EditEvent({ id }) {
+    const { data: session } = useSession()
     const [currentState, setState] = useState(null)
+    const { toast } = useToast()
     const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState(null)
     const [info, setInfo] = useState(null)
@@ -37,7 +42,13 @@ export default function EditEvent({ id }) {
                 if (res.ok) {
                     const eventInfo = await res.json()
                     setState(eventInfo)
-                    setInfo(eventInfo)
+                    setInfo({
+                        image: eventInfo.image,
+                        id: eventInfo.id,
+                        name: eventInfo.name,
+                        gameId: eventInfo.gameId,
+                        noVoucher: eventInfo.noVoucher,
+                    })
                     setVouchers(eventInfo.vouchers)
                     setDate({
                         from: eventInfo.startDate,
@@ -51,12 +62,59 @@ export default function EditEvent({ id }) {
     }, [])
 
     function handleReset() {
-        setInfo(currentState)
+        setInfo({
+            image: currentState.image,
+            id: currentState.id,
+            name: currentState.name,
+            gameId: currentState.gameId,
+            noVoucher: currentState.noVoucher,
+        })
         setVouchers(currentState.vouchers)
         setDate({
             from: currentState.startDate,
             to: currentState.endDate,
         })
+    }
+
+    async function handleSubmit() {
+        const data = {
+            ...info,
+            brandId: session.user.id,
+            start: new Date(date.from).toJSON(),
+            end: new Date(date.to).toJSON(),
+            voucherIds: vouchers.map((v) => v.id),
+        }
+
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/Events/${id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                }
+            )
+
+            if (!res.ok) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Edit Event Failed',
+                    duration: 3000,
+                    description: `Failed to edit event '${info.name}'. Please try again.`,
+                })
+            } else {
+                toast({
+                    variant: 'success',
+                    title: 'Edit Event Successfully',
+                    description: `Event '${info.name}' is updated.`,
+                    duration: 3000,
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     if (info === null) return <div>Loading...</div>
@@ -180,12 +238,12 @@ export default function EditEvent({ id }) {
                                     {vouchers.map((voucher, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center justify-between hover:bg-primary/5 p-1 rounded border border-primary"
+                                            className="flex items-center bg-muted rounded justify-center p-1"
                                         >
-                                            <p className="font-semibold">
+                                            <Ticket className="mr-2" />
+                                            <span className="font-semibold">
                                                 Voucher {voucher.id}
-                                            </p>
-                                            <p>{voucher.value}</p>
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
@@ -198,7 +256,7 @@ export default function EditEvent({ id }) {
                 <Button onClick={handleReset} variant="secondary">
                     Cancel
                 </Button>
-                <Button>Save changes</Button>
+                <Button onClick={handleSubmit}>Save changes</Button>
             </CardFooter>
         </Card>
     )

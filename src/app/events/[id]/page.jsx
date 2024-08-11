@@ -9,10 +9,10 @@ export default function EventPage({ params }) {
 
     return (
         <main className="flex flex-1 flex-col gap-4 p-8 md:gap-8">
-            <div className="grid w-full max-w-6xl gap-2">
+            <div className="grid w-full gap-2">
                 <h1 className="text-3xl font-semibold">Edit Event</h1>
             </div>
-            <div className="grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
+            <div className="grid w-full items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
                 <nav className="grid gap-4 text-sm text-muted-foreground">
                     <div
                         className={cn(
@@ -37,7 +37,7 @@ export default function EventPage({ params }) {
                         Game Settings
                     </div>
                 </nav>
-                <div className="grid gap-6">
+                <div className="grid place-self-center max-w-screen-2xl gap-6">
                     {isEditPage ? (
                         <EditEvent id={params.id} />
                     ) : (

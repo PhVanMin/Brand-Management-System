@@ -32,12 +32,14 @@ import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 import EventSheet from './createSheet'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { format } from 'date-fns'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function Overview({ className }) {
     const [events, setEvents] = useState([])
+    const initEvents = useRef(null)
     const { data: session } = useSession()
 
     const GetEvents = async () => {
@@ -47,6 +49,7 @@ export default function Overview({ className }) {
 
         if (res.ok) {
             const events = await res.json()
+            initEvents.current = events
             setEvents(events)
         }
     }
@@ -111,6 +114,13 @@ export default function Overview({ className }) {
                         <div className="relative ml-auto flex-1 md:grow-0">
                             <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
                             <Input
+                                onChange={(e) =>
+                                    setEvents(
+                                        initEvents.current.filter((event) =>
+                                            event.name.includes(e.target.value)
+                                        )
+                                    )
+                                }
                                 type="search"
                                 placeholder="Search..."
                                 className="w-[250px] h-8 rounded-md bg-background pl-8"
@@ -144,88 +154,90 @@ export default function Overview({ className }) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Image</TableHead>
-                                <TableHead>Game</TableHead>
-                                <TableHead className="hidden md:table-cell">
-                                    Voucher Number
-                                </TableHead>
-                                <TableHead className="hidden md:table-cell">
-                                    Start Date
-                                </TableHead>
-                                <TableHead className="hidden md:table-cell">
-                                    End Date
-                                </TableHead>
-                                <TableHead>
-                                    <span className="sr-only">Actions</span>
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {events.map((event, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{event.name}</TableCell>
-                                    <TableCell>
-                                        <Image
-                                            alt="Event"
-                                            className="rounded-md object-cover"
-                                            width="100"
-                                            height="50"
-                                            src="/voucher-1.jpg"
-                                        />
-                                    </TableCell>
-                                    <TableCell>{event.gameId}</TableCell>
-                                    <TableCell>{event.noVoucher}</TableCell>
-                                    <TableCell>
-                                        {format(
-                                            event.startDate,
-                                            'dd/MM/yyyy HH:mm:ss'
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {format(
-                                            event.endDate,
-                                            'dd/MM/yyyy HH:mm:ss'
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-haspopup="true"
-                                                    size="icon"
-                                                    variant="ghost"
-                                                >
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                    <span className="sr-only">
-                                                        Toggle menu
-                                                    </span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>
-                                                    Actions
-                                                </DropdownMenuLabel>
-                                                <Link
-                                                    href={`/events/${event.id}`}
-                                                >
-                                                    <DropdownMenuItem>
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                </Link>
-                                                <DropdownMenuItem>
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+                    <ScrollArea className="h-[768px]">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Image</TableHead>
+                                    <TableHead>Game</TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Voucher Number
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Start Date
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        End Date
+                                    </TableHead>
+                                    <TableHead>
+                                        <span className="sr-only">Actions</span>
+                                    </TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {events.map((event, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{event.name}</TableCell>
+                                        <TableCell>
+                                            <Image
+                                                alt="Event"
+                                                className="rounded-md object-cover"
+                                                width="100"
+                                                height="50"
+                                                src="/voucher-1.jpg"
+                                            />
+                                        </TableCell>
+                                        <TableCell>{event.gameId}</TableCell>
+                                        <TableCell>{event.noVoucher}</TableCell>
+                                        <TableCell>
+                                            {format(
+                                                event.startDate,
+                                                'dd/MM/yyyy HH:mm:ss'
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {format(
+                                                event.endDate,
+                                                'dd/MM/yyyy HH:mm:ss'
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        aria-haspopup="true"
+                                                        size="icon"
+                                                        variant="ghost"
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                        <span className="sr-only">
+                                                            Toggle menu
+                                                        </span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <Link
+                                                        href={`/events/${event.id}`}
+                                                    >
+                                                        <DropdownMenuItem>
+                                                            Edit
+                                                        </DropdownMenuItem>
+                                                    </Link>
+                                                    <DropdownMenuItem>
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </ScrollArea>
                 </CardContent>
             </Card>
         </div>

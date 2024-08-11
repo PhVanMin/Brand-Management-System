@@ -35,7 +35,7 @@ export default async function RootLayout({ children }) {
                 >
                     <SessionProvider session={session}>
                         <Navbar />
-                        <div className="flex-1 bg-primary/15 dark:bg-muted/10">
+                        <div className="flex-1 grid bg-primary/5 dark:bg-muted/10">
                             {children}
                         </div>
                         <Toaster />

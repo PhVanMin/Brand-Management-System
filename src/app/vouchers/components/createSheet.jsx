@@ -15,12 +15,15 @@ import { PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useSession } from 'next-auth/react'
+import { useToast } from '@/components/ui/use-toast'
 
 export default function CreateSheet({
     className,
     title = 'Create New Voucher',
     icon = false,
+    getVouchers,
 }) {
+    const { toast } = useToast()
     const { data: session } = useSession()
     const [info, setInfo] = useState({
         image: '/voucher-1.jpg',
@@ -38,7 +41,6 @@ export default function CreateSheet({
             expireDate: info.expireDate,
             status: 0,
         }
-        console.log(JSON.stringify(data))
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Vouchers`, {
             method: 'POST',
@@ -49,8 +51,21 @@ export default function CreateSheet({
         })
 
         if (res.ok) {
-            console.log(res)
+            toast({
+                variant: 'success',
+                title: 'Update voucher successful.',
+                duration: 3000,
+                description: 'Voucher is added to your brand.',
+            })
+            getVouchers()
             setOpen(false)
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Add voucher failed.',
+                duration: 3000,
+                description: 'Cannot add voucher. Please try again.',
+            })
         }
     }
 
