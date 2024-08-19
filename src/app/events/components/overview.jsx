@@ -41,10 +41,17 @@ export default function Overview({ className }) {
     const [events, setEvents] = useState([])
     const initEvents = useRef(null)
     const { data: session } = useSession()
+    console.log(session)
 
     const GetEvents = async () => {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Events`
+            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Events`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.user.token}`,
+                },
+            }
         )
 
         if (res.ok) {

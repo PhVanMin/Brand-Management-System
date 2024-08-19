@@ -182,7 +182,13 @@ export default function VoucherList({ className }) {
 
     async function GetVouchers() {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Vouchers`
+            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Vouchers`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.user.token}`,
+                },
+            }
         )
 
         if (res.ok) {

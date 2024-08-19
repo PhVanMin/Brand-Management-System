@@ -7,11 +7,25 @@ const handler = NextAuth({
             name: 'credentials',
             async authorize(credentials) {
                 try {
-                    const res = await fetch(`${process.env.API_URL}/Brands/1`)
+                    const data = {
+                        username: credentials.username,
+                        password: credentials.password,
+                    }
+
+                    const res = await fetch(
+                        `${process.env.IDENTITY_API_URL}/login`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        }
+                    )
 
                     if (res.ok) {
                         const user = await res.json()
-                        return user
+                        return { ...user, id: 1 }
                     }
 
                     return null
@@ -31,6 +45,7 @@ const handler = NextAuth({
         },
         async session({ session, token }) {
             session.user.id = token.id
+            session.user.token = token.token
             return session
         },
     },

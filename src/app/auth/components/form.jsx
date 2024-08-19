@@ -19,19 +19,19 @@ import { useToast } from '@/components/ui/use-toast'
 
 const signInData = {
     schema: z.object({
-        email: z.string().email(),
+        username: z.string().min(6),
         password: z.string().min(6),
     }),
     defaultValues: {
-        email: '',
+        username: '',
         password: '',
     },
     fields: [
         {
-            name: 'email',
-            placeholder: 'Email',
-            label: 'Email',
-            type: 'email',
+            name: 'username',
+            placeholder: 'Username',
+            label: 'Username',
+            type: 'text',
         },
         {
             name: 'password',
@@ -44,8 +44,8 @@ const signInData = {
 
 const signUpData = {
     schema: z.object({
-        email: z.string().email({
-            message: 'Invalid email address.',
+        username: z.string({
+            required_error: 'Username is required.',
         }),
         password: z.string().min(6, {
             message: 'Password must be at least 6 character.',
@@ -61,7 +61,7 @@ const signUpData = {
         }),
     }),
     defaultValues: {
-        email: '',
+        username: '',
         name: '',
         field: '',
         address: '',
@@ -70,10 +70,10 @@ const signUpData = {
     },
     fields: [
         {
-            name: 'email',
-            placeholder: 'Email',
-            label: 'Email',
-            haha: 'haha',
+            name: 'username',
+            placeholder: 'Username',
+            label: 'Username',
+            type: 'text',
         },
         {
             name: 'password',
@@ -114,7 +114,7 @@ export default function AuthForm({ isSignIn = true }) {
 
     const handleSignUp = async (values) => {
         const res = await signIn('credentials', {
-            email: values.email,
+            username: values.username,
             name: values.name,
             field: values.field,
             address: values.address,
@@ -140,7 +140,7 @@ export default function AuthForm({ isSignIn = true }) {
 
     const handleSignIn = async (values) => {
         const res = await signIn('credentials', {
-            email: values.email,
+            username: values.username,
             password: values.password,
             signin: true,
             redirect: false,
