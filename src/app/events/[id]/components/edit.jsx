@@ -25,7 +25,7 @@ import { Ticket } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSession } from 'next-auth/react'
 
-export default function EditEvent({ id }) {
+export default function EditEvent() {
     const { data: session } = useSession()
     const [currentState, setState] = useState(null)
     const { toast } = useToast()
@@ -36,8 +36,15 @@ export default function EditEvent({ id }) {
     useEffect(() => {
         async function GetEventInfo() {
             try {
+                if (!session.user.token) return
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/Events/${id}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/Events/${session.user.id}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${session.user.token}`,
+                        },
+                    }
                 )
                 if (res.ok) {
                     const eventInfo = await res.json()
@@ -59,7 +66,7 @@ export default function EditEvent({ id }) {
         }
 
         GetEventInfo()
-    }, [])
+    }, [session])
 
     function handleReset() {
         setInfo({
@@ -87,11 +94,12 @@ export default function EditEvent({ id }) {
 
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/Events/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/Events/${session.user.id}`,
                 {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.user.token}`,
                     },
                     body: JSON.stringify(data),
                 }
@@ -187,10 +195,10 @@ export default function EditEvent({ id }) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="0">
+                                            <SelectItem value="1">
                                                 Quiz
                                             </SelectItem>
-                                            <SelectItem value="1">
+                                            <SelectItem value="2">
                                                 Rolling in the Deep
                                             </SelectItem>
                                         </SelectGroup>
@@ -210,23 +218,13 @@ export default function EditEvent({ id }) {
                     <div className="grid grid-rows-2 gap-4">
                         <div className="flex flex-col gap-2">
                             <Label>Image</Label>
-                            <div className="rounded flex justify-center items-center flex-1 overflow-hidden border">
-                                {!info.image ? (
-                                    <img
-                                        className="object-fill aspect-video"
-                                        src={URL.createObjectURL(info.image)}
-                                        alt="image"
-                                    />
-                                ) : (
-                                    <p>No Image</p>
-                                )}
-                            </div>
+                            <div className="rounded flex justify-center items-center flex-1 overflow-hidden border"></div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <div className="flex justify-between items-center gap-2">
                                 <Label>Registered vouchers</Label>
                                 <VoucherPopover
-                                    id={id}
+                                    id={session.user.id}
                                     className="p-1.5 bg-primary cursor-pointer text-white rounded-md"
                                     iconClassname="h-3 w-3"
                                     onChange={setVouchers}

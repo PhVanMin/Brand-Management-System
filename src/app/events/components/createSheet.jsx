@@ -34,7 +34,7 @@ export default function EventSheet({ loadEvents, className }) {
         name: '',
         image: '/voucher-1.jpg',
         noVoucher: 0,
-        gameId: 0,
+        gameId: 1,
     })
     const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState({
@@ -61,6 +61,7 @@ export default function EventSheet({ loadEvents, className }) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.user.token}`,
                     },
                     body: JSON.stringify(data),
                 }
@@ -71,7 +72,7 @@ export default function EventSheet({ loadEvents, className }) {
                     variant: 'destructive',
                     title: 'Create Event Failed',
                     duration: 3000,
-                    description: `Event with name '${info.name}' already exists.`,
+                    description: `Event ${info.name} failed to create.`,
                 })
             } else {
                 toast({
@@ -186,7 +187,7 @@ export default function EventSheet({ loadEvents, className }) {
                         <Label className="text-right">Game</Label>
                         <div className="col-span-3">
                             <Select
-                                defaultValue="0"
+                                defaultValue="1"
                                 onValueChange={(e) =>
                                     setInfo((info) => ({
                                         ...info,
@@ -199,8 +200,8 @@ export default function EventSheet({ loadEvents, className }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="0">Quiz</SelectItem>
-                                        <SelectItem value="1">
+                                        <SelectItem value="1">Quiz</SelectItem>
+                                        <SelectItem value="2">
                                             Rolling in the Deep
                                         </SelectItem>
                                     </SelectGroup>

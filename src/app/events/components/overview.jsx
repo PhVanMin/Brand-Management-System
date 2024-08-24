@@ -41,7 +41,6 @@ export default function Overview({ className }) {
     const [events, setEvents] = useState([])
     const initEvents = useRef(null)
     const { data: session } = useSession()
-    console.log(session)
 
     const GetEvents = async () => {
         const res = await fetch(

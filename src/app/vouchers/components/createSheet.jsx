@@ -46,6 +46,7 @@ export default function CreateSheet({
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.user.token}`,
             },
             body: JSON.stringify(data),
         })

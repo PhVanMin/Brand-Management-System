@@ -43,6 +43,7 @@ import { useToast } from '@/components/ui/use-toast'
 
 function EditDialog({ open, setOpen, voucher, getVouchers }) {
     const [data, setData] = useState(voucher)
+    const { data: session } = useSession()
     const { toast } = useToast()
 
     async function handleSubmit() {
@@ -53,6 +54,7 @@ function EditDialog({ open, setOpen, voucher, getVouchers }) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.user.token}`,
                 },
                 body: JSON.stringify(info),
             }

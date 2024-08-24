@@ -14,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { FilePenLine } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 
 function VoucherCheckbox({ className, cKey, voucher, onChange, checked }) {
@@ -43,11 +44,18 @@ export default function VoucherPopover({
     id,
 }) {
     const [vouchers, setVouchers] = useState([])
+    const { data: session } = useSession()
 
     useEffect(() => {
         async function GetVouchers() {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/Brands/${id}/Vouchers`
+                `${process.env.NEXT_PUBLIC_API_URL}/Brands/${id}/Vouchers`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.user.token}`,
+                    },
+                }
             )
 
             if (res.ok) {
@@ -56,8 +64,8 @@ export default function VoucherPopover({
             }
         }
 
-        if (id) GetVouchers()
-    }, [id])
+        if (session.user.token && id) GetVouchers()
+    }, [session])
 
     return (
         <Dialog>

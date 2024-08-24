@@ -25,6 +25,7 @@ const handler = NextAuth({
 
                     if (res.ok) {
                         const user = await res.json()
+                        console.log(user)
                         return { ...user, id: 1 }
                     }
 
@@ -45,6 +46,7 @@ const handler = NextAuth({
         },
         async session({ session, token }) {
             session.user.id = token.id
+            session.user.username = token.userName
             session.user.token = token.token
             return session
         },
