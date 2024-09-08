@@ -26,20 +26,14 @@ export default function CreateSheet({
     const { toast } = useToast()
     const { data: session } = useSession()
     const [info, setInfo] = useState({
-        image: null,
-        value: 0,
         description: '',
-        expireDate: 0,
     })
     const [open, setOpen] = useState(false)
     const handleSubmit = async () => {
         const data = {
             brandId: session.user.id,
-            image: info.image,
-            value: info.value,
-            description: info.description,
-            expireDate: info.expireDate,
-            status: 0,
+            Status: 0,
+            ...info,
         }
 
         const formData = new FormData()
@@ -100,12 +94,27 @@ export default function CreateSheet({
                             onChange={(e) =>
                                 setInfo((info) => ({
                                     ...info,
-                                    image: e.target.files[0],
+                                    Image: e.target.files[0],
                                 }))
                             }
                             type="file"
                             accept="image/*"
                             id="image"
+                            className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="code" className="text-right">
+                            Code
+                        </Label>
+                        <Input
+                            onChange={(e) =>
+                                setInfo((info) => ({
+                                    ...info,
+                                    Code: e.target.value,
+                                }))
+                            }
+                            id="code"
                             className="col-span-3"
                         />
                     </div>
@@ -117,7 +126,7 @@ export default function CreateSheet({
                             onChange={(e) =>
                                 setInfo((info) => ({
                                     ...info,
-                                    value: e.target.value,
+                                    Value: e.target.value,
                                 }))
                             }
                             min="0"
@@ -135,7 +144,7 @@ export default function CreateSheet({
                             onChange={(e) =>
                                 setInfo((info) => ({
                                     ...info,
-                                    description: e.target.value,
+                                    Description: e.target.value,
                                 }))
                             }
                             id="description"
@@ -150,7 +159,7 @@ export default function CreateSheet({
                             onChange={(e) =>
                                 setInfo((info) => ({
                                     ...info,
-                                    expireDate: e.target.value,
+                                    ExpireDate: e.target.value,
                                 }))
                             }
                             defaultValue="0"
