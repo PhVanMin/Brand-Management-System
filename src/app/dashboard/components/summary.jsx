@@ -1,7 +1,7 @@
-import { Activity, DollarSign, Ticket, Users } from 'lucide-react'
+import { Activity, Ticket, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default function Summary({ className }) {
+export default function Summary({ className, data }) {
     return (
         <div className={className}>
             <Card x-chunk="dashboard-01-chunk-0">
@@ -12,10 +12,9 @@ export default function Summary({ className }) {
                     <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">45,231</div>
-                    <p className="text-xs text-muted-foreground">
-                        +20.1% from last day
-                    </p>
+                    <div className="text-2xl font-bold">
+                        {data?.playerData.Count ?? 0}
+                    </div>
                 </CardContent>
             </Card>
             <Card x-chunk="dashboard-01-chunk-1">
@@ -26,10 +25,9 @@ export default function Summary({ className }) {
                     <Ticket className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">+23</div>
-                    <p className="text-xs text-muted-foreground">
-                        +180.1% from last day
-                    </p>
+                    <div className="text-2xl font-bold">
+                        {data?.redeemVoucherData.redeemCount ?? 0}
+                    </div>
                 </CardContent>
             </Card>
             <Card x-chunk="dashboard-01-chunk-2">
@@ -40,10 +38,9 @@ export default function Summary({ className }) {
                     <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">+573</div>
-                    <p className="text-xs text-muted-foreground">
-                        +201 since last hour
-                    </p>
+                    <div className="text-2xl font-bold">
+                        {data?.playerData.onlineCount ?? 0}
+                    </div>
                 </CardContent>
             </Card>
         </div>

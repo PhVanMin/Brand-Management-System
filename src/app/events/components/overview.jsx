@@ -37,7 +37,7 @@ import { useSession } from 'next-auth/react'
 import { format } from 'date-fns'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
-export default function Overview({ className }) {
+export default function Overview({ className, setSelectEvent }) {
     const [events, setEvents] = useState([])
     const initEvents = useRef(null)
     const { data: session } = useSession()
@@ -160,7 +160,7 @@ export default function Overview({ className }) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <ScrollArea className="h-[768px]">
+                    <ScrollArea className="h-[500px]">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -183,15 +183,20 @@ export default function Overview({ className }) {
                             </TableHeader>
                             <TableBody>
                                 {events.map((event, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow
+                                        onClick={() => setSelectEvent(event)}
+                                        className="hover:bg-primary/40"
+                                        key={index}
+                                    >
                                         <TableCell>{event.name}</TableCell>
                                         <TableCell>
                                             <Image
                                                 alt="Event"
-                                                className="rounded-md object-cover"
+                                                className="rounded-md h-auto w-auto object-cover"
                                                 width="100"
                                                 height="50"
-                                                src="/voucher-1.jpg"
+                                                priority
+                                                src={event.image}
                                             />
                                         </TableCell>
                                         <TableCell>{event.gameId}</TableCell>

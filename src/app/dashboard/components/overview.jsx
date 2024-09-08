@@ -8,6 +8,7 @@ import {
     ChartLegendContent,
 } from '@/components/ui/chart'
 import { cn } from '@/lib/utils'
+import { LoaderIcon } from 'lucide-react'
 
 const chartConfig = {
     player: {
@@ -20,24 +21,21 @@ const chartConfig = {
     },
 }
 
-export default function Overview({ className, data }) {
-    const chartData = [
-        {
-            month: 'Event 1',
-            player: Math.floor(Math.random() * 5000) + 1000,
-            voucher: Math.floor(Math.random() * 5000) + 1000,
-        },
-        {
-            month: 'Event 2',
-            player: Math.floor(Math.random() * 5000) + 1000,
-            voucher: Math.floor(Math.random() * 5000) + 1000,
-        },
-        {
-            month: 'Event 3',
-            player: Math.floor(Math.random() * 5000) + 1000,
-            voucher: Math.floor(Math.random() * 5000) + 1000,
-        },
-    ]
+export default function Overview({ className, topEvents }) {
+    if (!topEvents) {
+        return (
+            <div>
+                <LoaderIcon />
+                <p>Loading</p>
+            </div>
+        )
+    }
+
+    var chartData = topEvents.map((data) => ({
+        name: data.name,
+        player: data.playerData.count,
+        voucher: data.redeemVoucherData.redeemCount,
+    }))
 
     return (
         <ChartContainer
@@ -46,7 +44,7 @@ export default function Overview({ className, data }) {
         >
             <BarChart accessibilityLayer data={chartData}>
                 <XAxis
-                    dataKey="month"
+                    dataKey="name"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}

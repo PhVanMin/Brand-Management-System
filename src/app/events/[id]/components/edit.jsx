@@ -17,28 +17,31 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DateSelect } from '../../components/dateSelect'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import VoucherPopover from '../../components/add-voucher'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Ticket } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 
-export default function EditEvent() {
+export default function EditEvent({ eventId }) {
     const { data: session } = useSession()
     const [currentState, setState] = useState(null)
     const { toast } = useToast()
     const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState(null)
     const [info, setInfo] = useState(null)
+    const [image, setImage] = useState()
+    const imageInputRef = useRef(null)
 
     useEffect(() => {
         async function GetEventInfo() {
             try {
                 if (!session.user.token) return
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/Events/${session.user.id}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/Events/${eventId}`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -50,7 +53,6 @@ export default function EditEvent() {
                     const eventInfo = await res.json()
                     setState(eventInfo)
                     setInfo({
-                        image: eventInfo.image,
                         id: eventInfo.id,
                         name: eventInfo.name,
                         gameId: eventInfo.gameId,
@@ -61,6 +63,7 @@ export default function EditEvent() {
                         from: eventInfo.startDate,
                         to: eventInfo.endDate,
                     })
+                    setImage(eventInfo.image)
                 }
             } catch (error) {}
         }
@@ -70,7 +73,6 @@ export default function EditEvent() {
 
     function handleReset() {
         setInfo({
-            image: currentState.image,
             id: currentState.id,
             name: currentState.name,
             gameId: currentState.gameId,
@@ -81,6 +83,8 @@ export default function EditEvent() {
             from: currentState.startDate,
             to: currentState.endDate,
         })
+        setImage(currentState.image)
+        imageInputRef.current.value = ''
     }
 
     async function handleSubmit() {
@@ -89,19 +93,23 @@ export default function EditEvent() {
             brandId: session.user.id,
             start: new Date(date.from).toJSON(),
             end: new Date(date.to).toJSON(),
-            voucherIds: vouchers.map((v) => v.id),
         }
 
         try {
+            const formData = new FormData()
+            Object.keys(data).forEach((key) => {
+                if (data[key]) formData.append(key, data[key])
+            })
+            vouchers.forEach((v) => formData.append('voucherIds', v.id))
+            console.log(data)
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/Events/${session.user.id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/Events/${eventId}`,
                 {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${session.user.token}`,
                     },
-                    body: JSON.stringify(data),
+                    body: formData,
                 }
             )
 
@@ -152,12 +160,16 @@ export default function EditEvent() {
                         <div>
                             <Label htmlFor="image">Image</Label>
                             <Input
-                                onChange={(e) =>
+                                ref={imageInputRef}
+                                onChange={(e) => {
                                     setInfo((info) => ({
                                         ...info,
                                         image: e.target.files[0],
                                     }))
-                                }
+                                    setImage(
+                                        URL.createObjectURL(e.target.files[0])
+                                    )
+                                }}
                                 type="file"
                                 accept="image/*"
                                 id="image"
@@ -182,7 +194,7 @@ export default function EditEvent() {
                             <Label>Game</Label>
                             <div>
                                 <Select
-                                    value={`${info.gameId}`}
+                                    value={info.gameId}
                                     onValueChange={(e) =>
                                         setInfo((info) => ({
                                             ...info,
@@ -195,7 +207,7 @@ export default function EditEvent() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="1">
+                                            <SelectItem value={info.gameId}>
                                                 Quiz
                                             </SelectItem>
                                             <SelectItem value="2">
@@ -218,7 +230,16 @@ export default function EditEvent() {
                     <div className="grid grid-rows-2 gap-4">
                         <div className="flex flex-col gap-2">
                             <Label>Image</Label>
-                            <div className="rounded flex justify-center items-center flex-1 overflow-hidden border"></div>
+                            <div className="rounded relative items-center flex-1 overflow-hidden border">
+                                <Image
+                                    src={image}
+                                    priority
+                                    alt="Event image"
+                                    className="h-auto"
+                                    sizes="300px"
+                                    fill
+                                />
+                            </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <div className="flex justify-between items-center gap-2">

@@ -9,51 +9,42 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 
-export default function Info({ className }) {
+export default function Info({ className, selectedEvent }) {
+    console.log(selectedEvent)
+    if (selectedEvent == null) {
+        return (
+            <div className={className}>
+                <Card
+                    className="overflow-hidden"
+                    x-chunk="dashboard-05-chunk-4"
+                >
+                    <CardHeader className="flex flex-row items-start bg-muted/50">
+                        <div className="grid gap-0.5">
+                            <CardTitle className="group flex items-center gap-2 text-lg">
+                                Select an event to view detail
+                            </CardTitle>
+                        </div>
+                    </CardHeader>
+                </Card>
+            </div>
+        )
+    }
+
     return (
         <div className={className}>
             <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
                 <CardHeader className="flex flex-row items-start bg-muted/50">
                     <div className="grid gap-0.5">
                         <CardTitle className="group flex items-center gap-2 text-lg">
-                            Order 1
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                            >
-                                <Copy className="h-3 w-3" />
-                                <span className="sr-only">Copy Order ID</span>
-                            </Button>
+                            {selectedEvent.name}
                         </CardTitle>
                         <CardDescription>
-                            Date: November 23, 2023
+                            Date:{' '}
+                            {new Date(selectedEvent.startDate).toUTCString()} -{' '}
+                            {new Date(selectedEvent.endDate).toUTCString()}
                         </CardDescription>
-                    </div>
-                    <div className="ml-auto flex items-center gap-1">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    size="icon"
-                                    variant="outline"
-                                    className="h-8 w-8"
-                                >
-                                    <MoreVertical className="h-3.5 w-3.5" />
-                                    <span className="sr-only">More</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 </CardHeader>
                 <CardContent className="p-6 text-sm">

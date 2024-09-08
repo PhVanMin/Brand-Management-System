@@ -5,18 +5,12 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
-import { addDays, format } from 'date-fns'
+import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 
-export default function Heading({ className }) {
-    const [date, setDate] = useState({
-        from: new Date(2022, 0, 20),
-        to: addDays(new Date(2022, 0, 20), 20),
-    })
-
+export default function Heading({ className, date, setDate }) {
     return (
         <div className={className}>
             <p>Dashboard</p>

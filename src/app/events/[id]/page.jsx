@@ -38,7 +38,11 @@ export default function EventPage({ params }) {
                     </div>
                 </nav>
                 <div className="grid place-self-center max-w-screen-2xl gap-6">
-                    {isEditPage ? <EditEvent /> : <Settings />}
+                    {isEditPage ? (
+                        <EditEvent eventId={params.id} />
+                    ) : (
+                        <Settings />
+                    )}
                 </div>
             </div>
         </main>

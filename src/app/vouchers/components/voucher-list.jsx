@@ -42,21 +42,27 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/components/ui/use-toast'
 
 function EditDialog({ open, setOpen, voucher, getVouchers }) {
-    const [data, setData] = useState(voucher)
+    const [data, setData] = useState({})
     const { data: session } = useSession()
     const { toast } = useToast()
+    const [image, setImage] = useState(voucher.image)
+
+    useEffect(() => {
+        if (!open) setImage(voucher.image)
+    }, [open])
 
     async function handleSubmit() {
         const { id, ...info } = data
+        const formData = new FormData()
+        Object.keys(info).forEach((key) => formData.append(key, data[key]))
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/Vouchers/${voucher.id}`,
             {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${session.user.token}`,
                 },
-                body: JSON.stringify(info),
+                body: formData,
             }
         )
 
@@ -88,9 +94,15 @@ function EditDialog({ open, setOpen, voucher, getVouchers }) {
                         Edit your brand voucher. Click Save when you are done.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-center border-dashed border rounded aspect-video">
-                        <p>Image</p>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="relative border-dashed border rounded aspect-video w-[400px]">
+                        <Image
+                            alt="Voucher"
+                            fill
+                            sizes="400px"
+                            className="rounded-md h-auto object-cover"
+                            src={image}
+                        />
                     </div>
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -98,12 +110,15 @@ function EditDialog({ open, setOpen, voucher, getVouchers }) {
                                 Image
                             </Label>
                             <Input
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     setData((info) => ({
                                         ...info,
                                         image: e.target.files[0],
                                     }))
-                                }
+                                    setImage(
+                                        URL.createObjectURL(e.target.files[0])
+                                    )
+                                }}
                                 type="file"
                                 id="image"
                                 className="col-span-3"
@@ -222,6 +237,7 @@ export default function VoucherList({ className }) {
                                 <TableRow>
                                     <TableHead>ID</TableHead>
                                     <TableHead>Image</TableHead>
+                                    <TableHead>Code</TableHead>
                                     <TableHead>Value</TableHead>
                                     <TableHead>Description</TableHead>
                                     <TableHead>Expire Date</TableHead>
@@ -237,11 +253,14 @@ export default function VoucherList({ className }) {
                                         <TableCell>
                                             <Image
                                                 alt="Voucher"
-                                                className="rounded-md object-cover"
+                                                className="rounded-md h-auto object-cover"
                                                 width="100"
                                                 height="50"
-                                                src="/voucher-1.jpg"
+                                                src={voucher.image}
                                             />
+                                        </TableCell>
+                                        <TableCell className="font-bold">
+                                            {voucher.code}
                                         </TableCell>
                                         <TableCell>${voucher.value}</TableCell>
                                         <TableCell>

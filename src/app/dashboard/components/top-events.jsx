@@ -1,3 +1,5 @@
+import { LoaderIcon } from 'lucide-react'
+
 function TopEventsCard({ event, keyProp }) {
     return (
         <div
@@ -6,19 +8,30 @@ function TopEventsCard({ event, keyProp }) {
         >
             <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">{event.name}</p>
-                <p className="text-sm text-muted-foreground">{event.game}</p>
+                <p className="text-sm text-muted-foreground">
+                    Redeemed Voucher: {event.voucher}
+                </p>
             </div>
-            <div className="ml-auto font-medium">{event.players} players</div>
+            <div className="ml-auto font-medium">{event.player} players</div>
         </div>
     )
 }
 
-export default function TopEvents() {
-    const events = [
-        { name: 'Ev 1', game: 'Ga 1', players: 1000 },
-        { name: 'Ev 2', game: 'Ga 2', players: 2000 },
-        { name: 'Ev 3', game: 'Ga 3', players: 3000 },
-    ]
+export default function TopEvents({ topEvents }) {
+    if (!topEvents || topEvents == null)
+        return (
+            <div>
+                <LoaderIcon />
+                <p>Loading</p>
+            </div>
+        )
+
+    const events = topEvents.map((data) => ({
+        name: data.name,
+        player: data.playerData.count,
+        voucher: data.redeemVoucherData.redeemCount,
+    }))
+
     return (
         <div className="space-y-3">
             {events.map((item, key) => (

@@ -26,7 +26,7 @@ export default function CreateSheet({
     const { toast } = useToast()
     const { data: session } = useSession()
     const [info, setInfo] = useState({
-        image: '/voucher-1.jpg',
+        image: null,
         value: 0,
         description: '',
         expireDate: 0,
@@ -35,20 +35,21 @@ export default function CreateSheet({
     const handleSubmit = async () => {
         const data = {
             brandId: session.user.id,
-            image: '/voucher-1.jpg',
+            image: info.image,
             value: info.value,
             description: info.description,
             expireDate: info.expireDate,
             status: 0,
         }
 
+        const formData = new FormData()
+        Object.keys(data).forEach((key) => formData.append(key, data[key]))
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Vouchers`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${session.user.token}`,
             },
-            body: JSON.stringify(data),
+            body: formData,
         })
 
         if (res.ok) {
@@ -103,6 +104,7 @@ export default function CreateSheet({
                                 }))
                             }
                             type="file"
+                            accept="image/*"
                             id="image"
                             className="col-span-3"
                         />

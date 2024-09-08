@@ -32,7 +32,7 @@ export default function EventSheet({ loadEvents, className }) {
     const { data: session } = useSession()
     const [info, setInfo] = useState({
         name: '',
-        image: '/voucher-1.jpg',
+        image: null,
         noVoucher: 0,
         gameId: 1,
     })
@@ -46,24 +46,25 @@ export default function EventSheet({ loadEvents, className }) {
         const data = {
             brandId: session.user.id,
             name: info.name,
-            image: '/voucher-1.jpg',
+            image: info.image,
             noVoucher: parseInt(info.noVoucher),
-            gameId: info.gameId,
             start: new Date(date.from).toJSON(),
             end: new Date(date.to).toJSON(),
-            voucherIds: vouchers.map((v) => v.id),
         }
 
         try {
+            const formData = new FormData()
+            Object.keys(data).forEach((key) => formData.append(key, data[key]))
+            vouchers.forEach((v) => formData.append('voucherIds', v.id))
+
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/Events`,
                 {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${session.user.token}`,
                     },
-                    body: JSON.stringify(data),
+                    body: formData,
                 }
             )
 
@@ -127,10 +128,11 @@ export default function EventSheet({ loadEvents, className }) {
                             onChange={(e) =>
                                 setInfo((info) => ({
                                     ...info,
-                                    image: e.target.value,
+                                    image: e.target.files[0],
                                 }))
                             }
                             type="file"
+                            accept="image/*"
                             id="image"
                             className="col-span-3"
                         />
