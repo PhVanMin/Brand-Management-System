@@ -60,8 +60,30 @@ export default function Overview({ className, setSelectEvent }) {
         }
     }
 
+    const [data, setData] = useState(null)
+    async function GetStatistic() {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/Brands/${session.user.id}/Statistics`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.user.token}`,
+                },
+            }
+        )
+
+        if (res.ok) {
+            const statistics = await res.json()
+            console.log(statistics)
+            setData(statistics)
+        }
+    }
+
     useEffect(() => {
-        if (session.user.id) GetEvents()
+        if (session.user.id) {
+            GetEvents()
+            GetStatistic()
+        }
     }, [session])
 
     return (
@@ -81,8 +103,10 @@ export default function Overview({ className, setSelectEvent }) {
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-1">
                     <CardHeader className="pb-2">
-                        <CardDescription>This Week</CardDescription>
-                        <CardTitle className="text-4xl">$1,329</CardTitle>
+                        <CardDescription>Total Player</CardDescription>
+                        <CardTitle className="text-4xl">
+                            {data.playerData.count}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-xs text-muted-foreground">
@@ -90,21 +114,39 @@ export default function Overview({ className, setSelectEvent }) {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Progress value={25} aria-label="25% increase" />
+                        <Progress
+                            value={
+                                data.playerData.onlineCount /
+                                (data.playerData.count == 0
+                                    ? 1
+                                    : data.playerData.count)
+                            }
+                            aria-label="25% increase"
+                        />
                     </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-2">
                     <CardHeader className="pb-2">
-                        <CardDescription>This Month</CardDescription>
-                        <CardTitle className="text-4xl">$5,329</CardTitle>
+                        <CardDescription>
+                            Total Voucher Redeemed
+                        </CardDescription>
+                        <CardTitle className="text-4xl">
+                            {data.redeemVoucherData.redeemCount}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-xs text-muted-foreground">
-                            +10% from last month
+                            +10% from last week
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Progress value={12} aria-label="12% increase" />
+                        <Progress
+                            value={
+                                data.redeemVoucherData.redeemCount /
+                                data.redeemVoucherData.total
+                            }
+                            aria-label="12% increase"
+                        />
                     </CardFooter>
                 </Card>
             </div>

@@ -18,7 +18,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import VoucherPopover from './add-voucher'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -34,13 +34,34 @@ export default function EventSheet({ loadEvents, className }) {
         name: '',
         image: null,
         noVoucher: 0,
-        gameId: 1,
     })
     const [vouchers, setVouchers] = useState([])
     const [date, setDate] = useState({
         from: Date.now(),
         to: Date.now(),
     })
+    const [gameData, setGameData] = useState(null)
+
+    useEffect(() => {
+        async function GetGames() {
+            const res = await fetch(
+                `https://localhost:6060/games?PageNumber=1&PageSize=5`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.user.token}`,
+                    },
+                }
+            )
+
+            if (res.ok) {
+                const games = await res.json()
+                setGameData(games)
+            }
+        }
+
+        if (session?.user?.id) GetGames()
+    }, [session])
 
     const handleSubmit = async () => {
         const data = {
@@ -50,6 +71,7 @@ export default function EventSheet({ loadEvents, className }) {
             noVoucher: parseInt(info.noVoucher),
             start: new Date(date.from).toJSON(),
             end: new Date(date.to).toJSON(),
+            gameId: info.gameId,
         }
 
         try {
@@ -188,27 +210,37 @@ export default function EventSheet({ loadEvents, className }) {
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Game</Label>
                         <div className="col-span-3">
-                            <Select
-                                defaultValue="1"
-                                onValueChange={(e) =>
-                                    setInfo((info) => ({
-                                        ...info,
-                                        gameId: e,
-                                    }))
-                                }
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a game" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="1">Quiz</SelectItem>
-                                        <SelectItem value="2">
-                                            Rolling in the Deep
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            {gameData ? (
+                                <Select
+                                    defaultValue={gameData.games[0].id}
+                                    onValueChange={(e) =>
+                                        setInfo((info) => ({
+                                            ...info,
+                                            gameId: e,
+                                        }))
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select a game" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem
+                                                value={gameData.games[0].id}
+                                            >
+                                                {gameData.games[0].gameName}
+                                            </SelectItem>
+                                            <SelectItem
+                                                value={gameData.games[1].id}
+                                            >
+                                                {gameData.games[1].gameName}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <Select />
+                            )}
                         </div>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
