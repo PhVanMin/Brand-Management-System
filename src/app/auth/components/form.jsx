@@ -50,19 +50,14 @@ const signUpData = {
         password: z.string().min(6, {
             message: 'Password must be at least 6 character.',
         }),
-        name: z.string({
-            required_error: 'Name is required.',
-        }),
         field: z.string({
             required_error: 'Field is required.',
         }),
-        address: z.string({
-            required_error: 'Address is required.',
-        }),
+        address: z.string(),
+        gps: z.string(),
     }),
     defaultValues: {
         username: '',
-        name: '',
         field: '',
         address: '',
         gps: '',
@@ -72,19 +67,13 @@ const signUpData = {
         {
             name: 'username',
             placeholder: 'Username',
-            label: 'Username',
+            label: 'Brand Name (Username)',
             type: 'text',
         },
         {
             name: 'password',
             placeholder: 'Password',
             label: 'Password',
-            type: 'text',
-        },
-        {
-            name: 'name',
-            placeholder: 'Name',
-            label: 'Brand Name',
             type: 'text',
         },
         {
@@ -97,6 +86,12 @@ const signUpData = {
             name: 'address',
             placeholder: 'Address',
             label: 'Address',
+            type: 'text',
+        },
+        {
+            name: 'gps',
+            placeholder: 'GPS (lat/long)',
+            label: 'GPS',
             type: 'text',
         },
     ],

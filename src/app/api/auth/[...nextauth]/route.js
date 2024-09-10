@@ -7,29 +7,49 @@ const handler = NextAuth({
             name: 'credentials',
             async authorize(credentials) {
                 try {
-                    const data = {
-                        username: credentials.username,
-                        password: credentials.password,
-                    }
+                    if (credentials.signin === 'true') {
+                        const res = await fetch(
+                            `${process.env.API_URL}/Brands/ByName/${credentials.username}`
+                        )
 
-                    const res = await fetch(
-                        `${process.env.IDENTITY_API_URL}/login`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(data),
+                        if (res.ok) {
+                            const brand = await res.json()
+                            console.log(brand)
+                            return {
+                                username: credentials.username,
+                                id: brand.id,
+                            }
                         }
-                    )
 
-                    if (res.ok) {
-                        const user = await res.json()
-                        console.log(user)
-                        return { ...user, id: 1 }
+                        return null
+                    } else {
+                        const data = {
+                            name: credentials.username,
+                            field: credentials.field,
+                            address: credentials.address,
+                            gps: credentials.gps,
+                        }
+
+                        const res = await fetch(
+                            `${process.env.API_URL}/Brands`,
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(data),
+                            }
+                        )
+
+                        if (res.ok) {
+                            const id = await res.text()
+                            console.log(id)
+                            return {
+                                username: credentials.username,
+                                id: id,
+                            }
+                        }
                     }
-
-                    return null
                 } catch (error) {
                     console.log(error)
                     return null
@@ -46,7 +66,7 @@ const handler = NextAuth({
         },
         async session({ session, token }) {
             session.user.id = token.id
-            session.user.username = token.userName
+            session.user.username = token.username
             session.user.token = token.token
             return session
         },
