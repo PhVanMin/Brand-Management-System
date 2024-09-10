@@ -64,7 +64,7 @@ export default function VoucherPopover({
             }
         }
 
-        if (session.user.token && id) GetVouchers()
+        if (session.user.id) GetVouchers()
     }, [session])
 
     return (

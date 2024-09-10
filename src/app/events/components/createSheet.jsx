@@ -18,7 +18,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import VoucherPopover from './add-voucher'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -41,6 +41,7 @@ export default function EventSheet({ loadEvents, className }) {
         to: Date.now(),
     })
     const [gameData, setGameData] = useState(null)
+    const gameSelectRef = useRef(null)
 
     useEffect(() => {
         async function GetGames() {
@@ -57,6 +58,10 @@ export default function EventSheet({ loadEvents, className }) {
             if (res.ok) {
                 const games = await res.json()
                 setGameData(games)
+                setInfo({
+                    ...info,
+                    gameId: games.games[0].id,
+                })
             }
         }
 
@@ -213,12 +218,12 @@ export default function EventSheet({ loadEvents, className }) {
                             {gameData ? (
                                 <Select
                                     defaultValue={gameData.games[0].id}
-                                    onValueChange={(e) =>
+                                    onValueChange={(e) => {
                                         setInfo((info) => ({
                                             ...info,
                                             gameId: e,
                                         }))
-                                    }
+                                    }}
                                 >
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a game" />

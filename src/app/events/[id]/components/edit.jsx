@@ -30,16 +30,16 @@ export default function EditEvent({ eventId }) {
     const { data: session } = useSession()
     const [currentState, setState] = useState(null)
     const { toast } = useToast()
-    const [vouchers, setVouchers] = useState([])
+    const [vouchers, setVouchers] = useState(null)
     const [date, setDate] = useState(null)
     const [info, setInfo] = useState(null)
     const [image, setImage] = useState()
     const imageInputRef = useRef(null)
+    const [games, setGames] = useState(null)
 
     useEffect(() => {
         async function GetEventInfo() {
             try {
-                if (!session.user.token) return
                 const res = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/Events/${eventId}`,
                     {
@@ -59,6 +59,7 @@ export default function EditEvent({ eventId }) {
                         noVoucher: eventInfo.noVoucher,
                     })
                     setVouchers(eventInfo.vouchers)
+                    console.log(eventInfo.vouchers)
                     setDate({
                         from: eventInfo.startDate,
                         to: eventInfo.endDate,
@@ -68,7 +69,25 @@ export default function EditEvent({ eventId }) {
             } catch (error) {}
         }
 
-        GetEventInfo()
+        async function GetGames() {
+            const res = await fetch(
+                `https://localhost:6060/games?PageNumber=1&PageSize=5`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.user.token}`,
+                    },
+                }
+            )
+
+            const games = await res.json()
+            setGames(games.games)
+        }
+
+        if (session?.user?.id) {
+            GetEventInfo()
+            GetGames()
+        }
     }, [session])
 
     function handleReset() {
@@ -101,7 +120,6 @@ export default function EditEvent({ eventId }) {
                 if (data[key]) formData.append(key, data[key])
             })
             vouchers.forEach((v) => formData.append('voucherIds', v.id))
-            console.log(data)
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/Events/${eventId}`,
                 {
@@ -133,7 +151,8 @@ export default function EditEvent({ eventId }) {
         }
     }
 
-    if (info === null) return <div>Loading...</div>
+    if (info == null && games == null && vouchers == null)
+        return <div>Loading...</div>
 
     return (
         <Card>
@@ -145,17 +164,19 @@ export default function EditEvent({ eventId }) {
                     <div className="grid">
                         <div>
                             <Label htmlFor="name">Name</Label>
-                            <Input
-                                autoComplete="true"
-                                value={info.name}
-                                onChange={(e) =>
-                                    setInfo((info) => ({
-                                        ...info,
-                                        name: e.target.value,
-                                    }))
-                                }
-                                id="name"
-                            />
+                            {info?.name && (
+                                <Input
+                                    autoComplete="true"
+                                    value={info?.name}
+                                    onChange={(e) =>
+                                        setInfo((info) => ({
+                                            ...info,
+                                            name: e.target.value,
+                                        }))
+                                    }
+                                    id="name"
+                                />
+                            )}
                         </div>
                         <div>
                             <Label htmlFor="image">Image</Label>
@@ -177,84 +198,94 @@ export default function EditEvent({ eventId }) {
                         </div>
                         <div>
                             <Label htmlFor="vouchers">Number of vouchers</Label>
-                            <Input
-                                onChange={(e) =>
-                                    setInfo((info) => ({
-                                        ...info,
-                                        noVoucher: e.target.value,
-                                    }))
-                                }
-                                value={info.noVoucher}
-                                min="0"
-                                type="number"
-                                id="vouchers"
-                            />
+                            {info?.noVoucher && (
+                                <Input
+                                    onChange={(e) =>
+                                        setInfo((info) => ({
+                                            ...info,
+                                            noVoucher: e.target.value,
+                                        }))
+                                    }
+                                    value={info?.noVoucher}
+                                    min="0"
+                                    type="number"
+                                    id="vouchers"
+                                />
+                            )}
                         </div>
                         <div>
                             <Label>Game</Label>
                             <div>
-                                <Select
-                                    value={info.gameId}
-                                    onValueChange={(e) =>
-                                        setInfo((info) => ({
-                                            ...info,
-                                            game: e,
-                                        }))
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a game" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value={info.gameId}>
-                                                Quiz
-                                            </SelectItem>
-                                            <SelectItem value="2">
-                                                Rolling in the Deep
-                                            </SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
+                                {games && (
+                                    <Select
+                                        value={info?.gameId}
+                                        onValueChange={(e) =>
+                                            setInfo((info) => ({
+                                                ...info,
+                                                game: e,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a game" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value={games[0].id}>
+                                                    {games[0].gameName}
+                                                </SelectItem>
+                                                <SelectItem value={games[1].id}>
+                                                    {games[1].gameName}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                )}
                             </div>
                         </div>
                         <div>
                             <Label htmlFor="date">Date range</Label>
-                            <DateSelect
-                                id="date"
-                                date={date}
-                                setDate={setDate}
-                            />
+                            {date && (
+                                <DateSelect
+                                    id="date"
+                                    date={date}
+                                    setDate={setDate}
+                                />
+                            )}
                         </div>
                     </div>
                     <div className="grid grid-rows-2 gap-4">
                         <div className="flex flex-col gap-2">
                             <Label>Image</Label>
                             <div className="rounded relative items-center flex-1 overflow-hidden border">
-                                <Image
-                                    src={image}
-                                    priority
-                                    alt="Event image"
-                                    className="h-auto"
-                                    sizes="300px"
-                                    fill
-                                />
+                                {image && (
+                                    <Image
+                                        src={image}
+                                        priority
+                                        alt="Event image"
+                                        className="h-auto"
+                                        sizes="300px"
+                                        fill
+                                    />
+                                )}
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <div className="flex justify-between items-center gap-2">
                                 <Label>Registered vouchers</Label>
-                                <VoucherPopover
-                                    id={session.user.id}
-                                    className="p-1.5 bg-primary cursor-pointer text-white rounded-md"
-                                    iconClassname="h-3 w-3"
-                                    onChange={setVouchers}
-                                    chosenVouchers={vouchers}
-                                />
+                                {vouchers && (
+                                    <VoucherPopover
+                                        id={session.user.id}
+                                        className="p-1.5 bg-primary cursor-pointer text-white rounded-md"
+                                        iconClassname="h-3 w-3"
+                                        onChange={setVouchers}
+                                        chosenVouchers={vouchers}
+                                    />
+                                )}
                             </div>
                             <ScrollArea className="h-44 rounded-md border">
                                 <div className="grid-cols-2 grid p-4 gap-2">
-                                    {vouchers.map((voucher, index) => (
+                                    {vouchers?.map((voucher, index) => (
                                         <div
                                             key={index}
                                             className="flex items-center bg-muted rounded justify-center p-1"

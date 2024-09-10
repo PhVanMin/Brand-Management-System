@@ -13,7 +13,7 @@ export default function Summary({ className, data }) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {data?.playerData.Count ?? 0}
+                        {data?.playerData.count ?? 0}
                     </div>
                 </CardContent>
             </Card>

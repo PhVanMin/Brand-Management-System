@@ -104,9 +104,11 @@ export default function Overview({ className, setSelectEvent }) {
                 <Card x-chunk="dashboard-05-chunk-1">
                     <CardHeader className="pb-2">
                         <CardDescription>Total Player</CardDescription>
-                        <CardTitle className="text-4xl">
-                            {data.playerData.count}
-                        </CardTitle>
+                        {data && (
+                            <CardTitle className="text-4xl">
+                                {data.playerData.count}
+                            </CardTitle>
+                        )}
                     </CardHeader>
                     <CardContent>
                         <div className="text-xs text-muted-foreground">
@@ -114,15 +116,17 @@ export default function Overview({ className, setSelectEvent }) {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Progress
-                            value={
-                                data.playerData.onlineCount /
-                                (data.playerData.count == 0
-                                    ? 1
-                                    : data.playerData.count)
-                            }
-                            aria-label="25% increase"
-                        />
+                        {data && (
+                            <Progress
+                                value={
+                                    data.playerData.onlineCount /
+                                    (data.playerData.count == 0
+                                        ? 1
+                                        : data.playerData.count)
+                                }
+                                aria-label="25% increase"
+                            />
+                        )}
                     </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-05-chunk-2">
@@ -130,9 +134,11 @@ export default function Overview({ className, setSelectEvent }) {
                         <CardDescription>
                             Total Voucher Redeemed
                         </CardDescription>
-                        <CardTitle className="text-4xl">
-                            {data.redeemVoucherData.redeemCount}
-                        </CardTitle>
+                        {data && (
+                            <CardTitle className="text-4xl">
+                                {data.redeemVoucherData.redeemCount}
+                            </CardTitle>
+                        )}
                     </CardHeader>
                     <CardContent>
                         <div className="text-xs text-muted-foreground">
@@ -140,13 +146,15 @@ export default function Overview({ className, setSelectEvent }) {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Progress
-                            value={
-                                data.redeemVoucherData.redeemCount /
-                                data.redeemVoucherData.total
-                            }
-                            aria-label="12% increase"
-                        />
+                        {data && (
+                            <Progress
+                                value={
+                                    data.redeemVoucherData.redeemCount /
+                                    data.redeemVoucherData.total
+                                }
+                                aria-label="12% increase"
+                            />
+                        )}
                     </CardFooter>
                 </Card>
             </div>
